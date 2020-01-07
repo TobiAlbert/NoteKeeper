@@ -2,8 +2,7 @@ import 'reflect-metadata';
 import express, { Request, Response } from 'express';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import container from './config/inversify.config';
-
-const PORT = 8080;
+import { Env } from './config/env';
 
 const server = new InversifyExpressServer(container);
 server.setConfig((app) => {
@@ -19,6 +18,7 @@ server.setConfig((app) => {
 });
 
 const serverInstance = server.build();
+const PORT = Env.all().port;
 serverInstance.listen(PORT, () => {
     console.log(`Listening on port: ${ PORT }`);
 });
