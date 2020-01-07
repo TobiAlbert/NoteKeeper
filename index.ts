@@ -1,17 +1,24 @@
+import 'reflect-metadata';
 import express, { Request, Response } from 'express';
-import healthController from './controllers/health';
+import { InversifyExpressServer } from 'inversify-express-utils';
+import container from './config/inversify.config';
 
-const app = express();
 const PORT = 8080;
 
-app.use('/', healthController);
-app.use('*', (req: Request, res: Response) => {
-    return res.status(404).json({
-        status: 'error',
-        message: 'Resource not available.'
+const server = new InversifyExpressServer(container);
+server.setConfig((app) => {
+
+    app.use(express.json());
+
+    app.use('*', (req: Request, res: Response) => {
+        return res.status(404).json({
+            status: 'error',
+            message: 'Resource not available.'
+        });
     });
 });
 
-app.listen(PORT, () => {
+const serverInstance = server.build();
+serverInstance.listen(PORT, () => {
     console.log(`Listening on port: ${ PORT }`);
 });
