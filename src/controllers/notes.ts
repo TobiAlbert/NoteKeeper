@@ -4,6 +4,7 @@ import TYPES from '../../config/types';
 import { Request, Response } from 'express';
 import { NoteRepository } from '../repositories/note';
 import { UpdateResourceException } from '../exceptions';
+import { HTTPStatus } from '../utils/constants';
 
 @controller('/notes')
 export class NotesController {
@@ -15,12 +16,12 @@ export class NotesController {
     public async getAllNotes(_: Request, res: Response) {
         try {
             const notes = await this.noteRepo.getAll();
-            return res.status(200).json({
+            return res.status(HTTPStatus.OK).json({
                 status: 'success',
                 data: { notes }
             });
         } catch (e) {
-            return res.status(500).json({
+            return res.status(HTTPStatus.SERVER_ERROR).json({
                 status: 'error',
                 message: e.message
             });
@@ -34,14 +35,14 @@ export class NotesController {
             const note = { title, body };
             const savedNote = await this.noteRepo.add(note);
 
-            return res.status(200).json({
+            return res.status(HTTPStatus.OK).json({
                 status: 'success',
                 data: {
                     note: savedNote
                 }
             });
         } catch (e) {
-            return res.status(500).json({
+            return res.status(HTTPStatus.SERVER_ERROR).json({
                 status: 'error',
                 message: e.message
             });
@@ -54,20 +55,20 @@ export class NotesController {
             const note = await this.noteRepo.getById(req.params.id);
 
             if (note) {
-                return res.status(200).json({
+                return res.status(HTTPStatus.OK).json({
                     status: 'success',
                     data: {
                         note
                     }
                 });
             } else {
-                return res.status(404).json({
+                return res.status(HTTPStatus.NO_RESOURCE).json({
                     status: 'error',
                     message: 'No Resource Found.'
                 });
             }
         } catch (e) {
-            return res.status(500).json({
+            return res.status(HTTPStatus.SERVER_ERROR).json({
                 status: 'error',
                 message: e.message
             });
@@ -82,12 +83,12 @@ export class NotesController {
 
             await this.noteRepo.update(req.params.id, properties);
 
-            return res.status(200).json({
+            return res.status(HTTPStatus.OK).json({
                 status: 'success',
                 message: 'Note Updated.'
             });
         } catch (e) {
-            const code = e instanceof UpdateResourceException ? 404 : 500;
+            const code = e instanceof UpdateResourceException ? HTTPStatus.NO_RESOURCE : HTTPStatus.SERVER_ERROR;
 
             return res.status(code).json({
                 status: 'error',
@@ -102,7 +103,7 @@ export class NotesController {
             const affected = await this.noteRepo.delete(req.params.id);
 
             const [code, message, status] =
-                affected ? [200, 'Note Deleted', 'success'] : [404, 'No Resource Found', 'error'];
+                affected ? [HTTPStatus.OK, 'Note Deleted', 'success'] : [HTTPStatus.NO_RESOURCE, 'No Resource Found', 'error'];
 
             return res.status(code).json({
                 status,
@@ -110,7 +111,7 @@ export class NotesController {
             });
 
         } catch (e) {
-            return res.status(500).json({
+            return res.status(HTTPStatus.SERVER_ERROR).json({
                 status: 'error',
                 message: e.message
             });
