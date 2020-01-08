@@ -1,8 +1,9 @@
-import { controller, httpDelete, httpGet, httpPost } from 'inversify-express-utils';
+import { controller, httpDelete, httpGet, httpPost, httpPut } from 'inversify-express-utils';
 import { inject } from 'inversify';
 import TYPES from '../../config/types';
 import { Request, Response } from 'express';
 import { NoteRepository } from '../repositories/note';
+import { UpdateResourceException } from '../exceptions';
 
 @controller('/notes')
 export class NotesController {
@@ -67,6 +68,28 @@ export class NotesController {
             }
         } catch (e) {
             return res.status(500).json({
+                status: 'error',
+                message: e.message
+            });
+        }
+    }
+
+    @httpPut('/:id')
+    public async update(req: Request, res: Response) {
+        try {
+            const { title, body } = req.body;
+            const properties = { title, body };
+
+            await this.noteRepo.update(req.params.id, properties);
+
+            return res.status(200).json({
+                status: 'success',
+                message: 'Note Updated.'
+            });
+        } catch (e) {
+            const code = e instanceof UpdateResourceException ? 404 : 500;
+
+            return res.status(code).json({
                 status: 'error',
                 message: e.message
             });

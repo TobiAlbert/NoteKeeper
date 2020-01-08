@@ -1,6 +1,7 @@
 import { Note } from '../entity/Note';
 import { DeleteResult, getConnection, InsertResult } from 'typeorm';
 import { injectable } from 'inversify';
+import { UpdateResourceException } from '../exceptions';
 
 @injectable()
 export class NoteRepository {
@@ -40,6 +41,20 @@ export class NoteRepository {
             .createQueryBuilder()
             .where({ id: id })
             .getOne();
+    }
+
+    async update(id: string, properties: any): Promise<number> {
+
+        const note = await this.getById(id);
+        if (!note) throw new UpdateResourceException('No Resource Found');
+
+        return this.connection
+            .getRepository(Note)
+            .createQueryBuilder()
+            .update(Note)
+            .set(properties)
+            .where({ id: id })
+            .execute();
     }
 
     async delete(id: string): Promise<number> {
