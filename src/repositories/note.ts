@@ -17,10 +17,10 @@ export class NoteRepository {
             .insert()
             .into(Note)
             .values(note)
-            .output(["id", "title", "body"])
+            .output(['id', 'title', 'body'])
             .execute()
             .then((value: InsertResult) => {
-                return value.generatedMaps[0]
+                return value.generatedMaps[0];
             });
 
     }
@@ -28,8 +28,9 @@ export class NoteRepository {
     async getAll(): Promise<Note[]> {
         return this.connection
             .createQueryBuilder()
-            .select("note")
-            .from(Note, "note")
+            .select('note')
+            .from(Note, 'note')
+            .orderBy('note.updatedAt', 'DESC')
             .getMany();
     }
 
@@ -38,7 +39,7 @@ export class NoteRepository {
             .getRepository(Note)
             .createQueryBuilder()
             .where({ id: id })
-            .getOne()
+            .getOne();
     }
 
     async delete(id: string): Promise<number> {
@@ -49,8 +50,8 @@ export class NoteRepository {
             .where({ id: id })
             .execute()
             .then((res: DeleteResult) => res.affected)
-            .catch((reason:any) => {
-                throw Error(reason)
-            })
+            .catch((reason: any) => {
+                throw Error(reason);
+            });
     }
 }
