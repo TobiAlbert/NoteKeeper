@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import { Note } from '../src/entity/Note';
 import { Env } from './env';
 
 const env = Env.all();
@@ -14,8 +13,12 @@ export class PostgresConnection {
             username: env.pg_username,
             password: env.pg_password,
             database: env.pg_database,
-            entities: [Note],
-            synchronize: true,
+            synchronize: false,
+            entities: ['../src/entity/*.js'],
+            migrations: [__dirname + '../src/migration/*.js'],
+            cli: {
+                migrationsDir: 'migration'
+            },
             logging: env.environment !== 'production'
         }).then(connection => {
             // work can start on the entities
