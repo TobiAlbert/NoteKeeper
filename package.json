@@ -23,6 +23,6 @@
     "inversify-express-utils": "^6.3.2",
     "pg": "^7.17.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.22"
+    "typeorm": "^0.2.25"
   }
 }
